@@ -47,7 +47,7 @@ class _AppMainScreenState extends State<AppMainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              selectedIndex == 3 ? Iconsax.setting2 : Iconsax.setting2,
+              selectedIndex == 3 ? Iconsax.setting5 : Iconsax.setting,
             ),
             label: "Setting",
           ),
