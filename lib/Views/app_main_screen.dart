@@ -58,8 +58,175 @@ class _AppMainScreenState extends State<AppMainScreen> {
           });
         },
       ),
-      body: Center(
+      body: selectedIndex == 0 ? MyAppHomeScreen() : Center(
         child: Text("Page index: $selectedIndex"),
+      ),
+    );
+  }
+}
+
+class MyAppHomeScreen extends StatefulWidget {
+  const MyAppHomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MyAppHomeScreen> createState() => _MyAppHomeScreenState();
+}
+
+class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              children: [
+                headerParts(),
+                SizedBox(height: 20),
+                mySearchBar(),
+                SizedBox(height: 20),
+                // for banner
+                const BannerToExplore(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 20,
+                  ), // EdgeInsets.symmetric
+                  child: Text(
+                    "Categories",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ), // TextStyle
+                  ), // Text
+                ), // Padding
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Padding headerParts() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        children: [
+          Text(
+            "What are you\ncooking today?",
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              height: 1,
+            ),
+          ),
+          Spacer(),
+          IconButton(
+            onPressed: () {},
+            style: IconButton.styleFrom(
+              fixedSize: Size(55, 55),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+            ),
+            icon: Icon(Iconsax.notification),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container mySearchBar() {
+    return Container(
+      width: double.infinity,
+      height: 60,
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(30),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: "Search any recipes",
+          hintStyle: TextStyle(
+            color: Colors.grey,
+            fontSize: 16,
+          ),
+          prefixIcon: Icon(
+            Iconsax.search_normal,
+            color: Colors.grey,
+          ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(vertical: 15),
+        ),
+      ),
+    );
+  }
+}
+
+class BannerToExplore extends StatelessWidget {
+  const BannerToExplore({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 170,
+      decoration: BoxDecoration(
+        color: Color(0xFF71B77A),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: 32,
+            left: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Cook the best\nrecipes at home",
+                  style: TextStyle(
+                    height: 1.1,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text(
+                    "Explore",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF71B77A),
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 0,
+            bottom: 0,
+            right: -20,
+            child: Image.network(
+              "https://pngimg.com/d/chef_PNG190.png",
+              width: 180,
+            ),
+          ),
+        ],
       ),
     );
   }
