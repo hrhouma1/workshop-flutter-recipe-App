@@ -80,135 +80,134 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              children: [
-                headerParts(),
-                SizedBox(height: 20),
-                mySearchBar(),
-                SizedBox(height: 20),
-                // for banner
-                const BannerToExplore(),
-                const Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 20,
-                  ), // EdgeInsets.symmetric
-                  child: Text(
-                    "Categories",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ), // TextStyle
-                  ), // Text
-                ), // Padding
-                // Categories buttons from Firestore
-                StreamBuilder<QuerySnapshot>(
-                  stream: _firestore.collection('categories').snapshots(),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              headerParts(),
+              SizedBox(height: 20),
+              mySearchBar(),
+              SizedBox(height: 20),
+              // for banner
+              const BannerToExplore(),
+              const Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: 20,
+                ), // EdgeInsets.symmetric
+                child: Text(
+                  "Categories",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ), // TextStyle
+                ), // Text
+              ), // Padding
+              // Categories buttons from Firestore
+              StreamBuilder<QuerySnapshot>(
+                stream: _firestore.collection('App-Category').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List<String> categories = ["All"];
+                    for (var doc in snapshot.data!.docs) {
+                      categories.add(doc['name']);
+                    }
+                    return categoryButtons(categories);
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                },
+              ),
+              SizedBox(height: 20),
+              // Recipes from Firestore
+              Container(
+                height: 400, // Hauteur fixe pour éviter les contraintes infinies
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: selectedCategory == "All" 
+                      ? _firestore.collection('Complete-Flutter-App').snapshots()
+                      : _firestore.collection('Complete-Flutter-App')
+                          .where('category', isEqualTo: selectedCategory)
+                          .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      List<String> categories = ["All"];
-                      for (var doc in snapshot.data!.docs) {
-                        categories.add(doc['name']);
-                      }
-                      return categoryButtons(categories);
-                    } else {
-                      return CircularProgressIndicator();
-                    }
-                  },
-                ),
-                SizedBox(height: 20),
-                // Recipes from Firestore
-                Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: selectedCategory == "All" 
-                        ? _firestore.collection('recipes').snapshots()
-                        : _firestore.collection('recipes')
-                            .where('category', isEqualTo: selectedCategory)
-                            .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 0.8,
-                          ),
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            var recipe = snapshot.data!.docs[index];
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(15),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.1),
-                                    spreadRadius: 1,
-                                    blurRadius: 5,
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                                        image: DecorationImage(
-                                          image: NetworkImage(recipe['image'] ?? ''),
-                                          fit: BoxFit.cover,
-                                        ),
+                      return GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 0.8,
+                        ),
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          var recipe = snapshot.data!.docs[index];
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                                      image: DecorationImage(
+                                        image: NetworkImage(recipe['image'] ?? ''),
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.all(10),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          recipe['name'] ?? '',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        recipe['name'] ?? '',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
                                         ),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          recipe['description'] ?? '',
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 12,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        recipe['description'] ?? '',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 12,
                                         ),
-                                      ],
-                                    ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        return Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
