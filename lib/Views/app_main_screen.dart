@@ -73,6 +73,9 @@ class MyAppHomeScreen extends StatefulWidget {
 }
 
 class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
+  String selectedCategory = "All";
+  List<String> categories = ["All", "Dinner", "Lunch", "Breakfast"];
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -101,6 +104,8 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                     ), // TextStyle
                   ), // Text
                 ), // Padding
+                // Categories buttons
+                categoryButtons(),
               ],
             ),
           ),
@@ -163,6 +168,39 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
           contentPadding: EdgeInsets.symmetric(vertical: 15),
         ),
       ),
+    );
+  }
+
+  Widget categoryButtons() {
+    return Row(
+      children: categories.map((category) {
+        bool isSelected = selectedCategory == category;
+        return Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedCategory = category;
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              decoration: BoxDecoration(
+                color: isSelected ? kprimaryColor : Colors.grey[200],
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Text(
+                category,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.grey[600],
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
