@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../constants.dart';
 
 class AppMainScreen extends StatefulWidget {
@@ -74,7 +75,7 @@ class MyAppHomeScreen extends StatefulWidget {
 
 class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
   String selectedCategory = "All";
-  List<String> categories = ["All", "Dinner", "Lunch", "Breakfast"];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +105,106 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                     ), // TextStyle
                   ), // Text
                 ), // Padding
-                // Categories buttons
-                categoryButtons(),
+                // Categories buttons from Firestore
+                StreamBuilder<QuerySnapshot>(
+                  stream: _firestore.collection('categories').snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<String> categories = ["All"];
+                      for (var doc in snapshot.data!.docs) {
+                        categories.add(doc['name']);
+                      }
+                      return categoryButtons(categories);
+                    } else {
+                      return CircularProgressIndicator();
+                    }
+                  },
+                ),
+                SizedBox(height: 20),
+                // Recipes from Firestore
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: selectedCategory == "All" 
+                        ? _firestore.collection('recipes').snapshots()
+                        : _firestore.collection('recipes')
+                            .where('category', isEqualTo: selectedCategory)
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return GridView.builder(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.8,
+                          ),
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            var recipe = snapshot.data!.docs[index];
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    spreadRadius: 1,
+                                    blurRadius: 5,
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                                        image: DecorationImage(
+                                          image: NetworkImage(recipe['image'] ?? ''),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          recipe['name'] ?? '',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        SizedBox(height: 5),
+                                        Text(
+                                          recipe['description'] ?? '',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -171,7 +270,7 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
     );
   }
 
-  Widget categoryButtons() {
+  Widget categoryButtons(List<String> categories) {
     return Row(
       children: categories.map((category) {
         bool isSelected = selectedCategory == category;
