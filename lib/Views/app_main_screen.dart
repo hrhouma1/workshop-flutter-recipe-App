@@ -160,11 +160,29 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                                      image: DecorationImage(
-                                        image: NetworkImage(recipe['image'] ?? ''),
-                                        fit: BoxFit.cover,
-                                      ),
+                                      color: Colors.grey[200],
+                                      image: recipe.data() != null && 
+                                             (recipe.data() as Map<String, dynamic>).containsKey('image') &&
+                                             recipe['image'] != null && 
+                                             recipe['image'].toString().isNotEmpty
+                                          ? DecorationImage(
+                                              image: NetworkImage(recipe['image']),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : null,
                                     ),
+                                    child: recipe.data() == null || 
+                                           !(recipe.data() as Map<String, dynamic>).containsKey('image') ||
+                                           recipe['image'] == null || 
+                                           recipe['image'].toString().isEmpty
+                                        ? Center(
+                                            child: Icon(
+                                              Icons.restaurant,
+                                              size: 50,
+                                              color: Colors.grey[400],
+                                            ),
+                                          )
+                                        : null,
                                   ),
                                 ),
                                 Padding(
@@ -173,7 +191,10 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        recipe['name'] ?? '',
+                                        recipe.data() != null && 
+                                        (recipe.data() as Map<String, dynamic>).containsKey('name')
+                                            ? recipe['name'] ?? 'Sans nom'
+                                            : 'Sans nom',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
@@ -183,13 +204,37 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                                       ),
                                       SizedBox(height: 5),
                                       Text(
-                                        recipe['description'] ?? '',
+                                        recipe.data() != null && 
+                                        (recipe.data() as Map<String, dynamic>).containsKey('time')
+                                            ? "${recipe['time']} min • ${recipe.data() != null && (recipe.data() as Map<String, dynamic>).containsKey('cal') ? recipe['cal'] : '0'} cal"
+                                            : 'Temps non spécifié',
                                         style: TextStyle(
                                           color: Colors.grey[600],
                                           fontSize: 12,
                                         ),
-                                        maxLines: 2,
+                                        maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(height: 3),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.star,
+                                            color: Colors.orange,
+                                            size: 14,
+                                          ),
+                                          SizedBox(width: 2),
+                                          Text(
+                                            recipe.data() != null && 
+                                            (recipe.data() as Map<String, dynamic>).containsKey('rating')
+                                                ? "${recipe['rating']} (${recipe.data() != null && (recipe.data() as Map<String, dynamic>).containsKey('reviews') ? recipe['reviews'] : '0'})"
+                                                : '0.0 (0)',
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -270,35 +315,38 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
   }
 
   Widget categoryButtons(List<String> categories) {
-    return Row(
-      children: categories.map((category) {
-        bool isSelected = selectedCategory == category;
-        return Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedCategory = category;
-              });
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              decoration: BoxDecoration(
-                color: isSelected ? kprimaryColor : Colors.grey[200],
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Text(
-                category,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.grey[600],
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: categories.map((category) {
+          bool isSelected = selectedCategory == category;
+          return Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedCategory = category;
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isSelected ? kprimaryColor : Colors.grey[200],
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Text(
+                  category,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.grey[600],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }
