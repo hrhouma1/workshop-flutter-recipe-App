@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:iconsax/iconsax.dart';
 import '../constants.dart';
 import '../Provider/favorite_provider.dart';
+import '../Provider/quantity_provider.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   final DocumentSnapshot recipe;
@@ -18,6 +19,15 @@ class RecipeDetailScreen extends StatefulWidget {
 }
 
 class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Reset quantity when entering the page
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<QuantityProvider>(context, listen: false).resetQuantity();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var recipeData = widget.recipe.data() as Map<String, dynamic>;
@@ -180,73 +190,87 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                   SizedBox(height: 30),
                   
                   // Ingredients section
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Ingredients",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Row(
+                  Consumer<QuantityProvider>(
+                    builder: (context, quantityProvider, child) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          IconButton(
-                            onPressed: () {
-                              // Decrease quantity logic
-                            },
-                            icon: Container(
-                              padding: EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey[300]!),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Icon(
-                                Icons.remove,
-                                size: 16,
-                                color: Colors.grey[600],
-                              ),
+                          Text(
+                            "Ingredients",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
                           ),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                            child: Text(
-                              "1",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  quantityProvider.decreaseQuantity();
+                                },
+                                icon: Container(
+                                  padding: EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey[300]!),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Icon(
+                                    Icons.remove,
+                                    size: 16,
+                                    color: quantityProvider.quantity > 1 
+                                        ? Colors.grey[600] 
+                                        : Colors.grey[400],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              // Increase quantity logic
-                            },
-                            icon: Container(
-                              padding: EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey[300]!),
-                                borderRadius: BorderRadius.circular(6),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                                child: Text(
+                                  "${quantityProvider.quantity}",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                              child: Icon(
-                                Icons.add,
-                                size: 16,
-                                color: Colors.grey[600],
+                              IconButton(
+                                onPressed: () {
+                                  quantityProvider.increaseQuantity();
+                                },
+                                icon: Container(
+                                  padding: EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey[300]!),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Icon(
+                                    Icons.add,
+                                    size: 16,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         ],
-                      ),
-                    ],
+                      );
+                    },
                   ),
                   SizedBox(height: 20),
                   
                   // Ingredients list
-                  _buildIngredientItem("Beef", "assets/beef.png"),
-                  _buildIngredientItem("Dice tomato", "assets/tomato.png"),
-                  _buildIngredientItem("Pizza base", "assets/pizza_base.png"),
+                  Consumer<QuantityProvider>(
+                    builder: (context, quantityProvider, child) {
+                      return Column(
+                        children: [
+                          _buildIngredientItem("Beef", "100g", quantityProvider),
+                          _buildIngredientItem("Dice tomato", "2 pieces", quantityProvider),
+                          _buildIngredientItem("Pizza base", "1 piece", quantityProvider),
+                        ],
+                      );
+                    },
+                  ),
                   
                   SizedBox(height: 40),
                   
@@ -291,7 +315,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     );
   }
   
-  Widget _buildIngredientItem(String name, String imagePath) {
+  Widget _buildIngredientItem(String name, String amount, QuantityProvider quantityProvider) {
     return Container(
       margin: EdgeInsets.only(bottom: 15),
       padding: EdgeInsets.all(15),
@@ -328,12 +352,13 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               ),
             ),
           ),
-          // Amount
+          // Amount with calculation
           Text(
-            "100g",
+            quantityProvider.calculateIngredientAmount(amount),
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
