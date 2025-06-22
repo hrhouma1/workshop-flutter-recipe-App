@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../constants.dart';
+import 'view_all_items.dart';
 
 class AppMainScreen extends StatefulWidget {
   const AppMainScreen({Key? key}) : super(key: key);
@@ -108,8 +109,14 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                     ), // Text
                     GestureDetector(
                       onTap: () {
-                        // Action pour "View All"
-                        print("View All Categories clicked");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewAllItems(
+                              title: "All Categories",
+                            ),
+                          ),
+                        );
                       },
                       child: Text(
                         "View All",
@@ -152,8 +159,14 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Action pour "View All Recipes"
-                      print("View All Recipes clicked");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewAllItems(
+                            title: "Popular Recipes",
+                          ),
+                        ),
+                      );
                     },
                     child: Text(
                       "View All",
