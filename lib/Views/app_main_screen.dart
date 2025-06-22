@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../constants.dart';
 import 'view_all_items.dart';
 import 'favorite_screen.dart';
+import 'recipe_detail_screen.dart';
 import '../Provider/favorite_provider.dart';
 
 class AppMainScreen extends StatefulWidget {
@@ -206,142 +207,152 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                           var recipe = snapshot.data!.docs[index];
                           return Consumer<FavoriteProvider>(
                             builder: (context, favoriteProvider, child) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.1),
-                                      spreadRadius: 1,
-                                      blurRadius: 5,
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => RecipeDetailScreen(recipe: recipe),
                                     ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                                          color: Colors.grey[200],
-                                          image: recipe.data() != null && 
-                                                 (recipe.data() as Map<String, dynamic>).containsKey('image') &&
-                                                 recipe['image'] != null && 
-                                                 recipe['image'].toString().isNotEmpty
-                                              ? DecorationImage(
-                                                  image: NetworkImage(recipe['image']),
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : null,
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            // Default icon if no image
-                                            if (recipe.data() == null || 
-                                               !(recipe.data() as Map<String, dynamic>).containsKey('image') ||
-                                               recipe['image'] == null || 
-                                               recipe['image'].toString().isEmpty)
-                                              Center(
-                                                child: Icon(
-                                                  Icons.restaurant,
-                                                  size: 50,
-                                                  color: Colors.grey[400],
-                                                ),
-                                              ),
-                                            // Favorite button
-                                            Positioned(
-                                              top: 10,
-                                              right: 10,
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  favoriteProvider.toggleFavorite(recipe);
-                                                },
-                                                child: Container(
-                                                  padding: EdgeInsets.all(8),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    shape: BoxShape.circle,
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.grey.withOpacity(0.3),
-                                                        spreadRadius: 1,
-                                                        blurRadius: 3,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: Icon(
-                                                    favoriteProvider.isExist(recipe) 
-                                                        ? Iconsax.heart5 
-                                                        : Iconsax.heart,
-                                                    size: 16,
-                                                    color: favoriteProvider.isExist(recipe) 
-                                                        ? Colors.red 
-                                                        : Colors.grey[600],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.1),
+                                        spreadRadius: 1,
+                                        blurRadius: 5,
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            recipe.data() != null && 
-                                            (recipe.data() as Map<String, dynamic>).containsKey('name')
-                                                ? recipe['name'] ?? 'Sans nom'
-                                                : 'Sans nom',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                                            color: Colors.grey[200],
+                                            image: recipe.data() != null && 
+                                                   (recipe.data() as Map<String, dynamic>).containsKey('image') &&
+                                                   recipe['image'] != null && 
+                                                   recipe['image'].toString().isNotEmpty
+                                                ? DecorationImage(
+                                                    image: NetworkImage(recipe['image']),
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : null,
                                           ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            recipe.data() != null && 
-                                            (recipe.data() as Map<String, dynamic>).containsKey('time')
-                                                ? "${recipe['time']} min • ${recipe.data() != null && (recipe.data() as Map<String, dynamic>).containsKey('cal') ? recipe['cal'] : '0'} cal"
-                                                : 'Temps non spécifié',
-                                            style: TextStyle(
-                                              color: Colors.grey[600],
-                                              fontSize: 12,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          SizedBox(height: 3),
-                                          Row(
+                                          child: Stack(
                                             children: [
-                                              Icon(
-                                                Icons.star,
-                                                color: Colors.orange,
-                                                size: 14,
-                                              ),
-                                              SizedBox(width: 2),
-                                              Text(
-                                                recipe.data() != null && 
-                                                (recipe.data() as Map<String, dynamic>).containsKey('rating')
-                                                    ? "${recipe['rating']} (${recipe.data() != null && (recipe.data() as Map<String, dynamic>).containsKey('reviews') ? recipe['reviews'] : '0'})"
-                                                    : '0.0 (0)',
-                                                style: TextStyle(
-                                                  color: Colors.grey[600],
-                                                  fontSize: 11,
+                                              // Default icon if no image
+                                              if (recipe.data() == null || 
+                                                 !(recipe.data() as Map<String, dynamic>).containsKey('image') ||
+                                                 recipe['image'] == null || 
+                                                 recipe['image'].toString().isEmpty)
+                                                Center(
+                                                  child: Icon(
+                                                    Icons.restaurant,
+                                                    size: 50,
+                                                    color: Colors.grey[400],
+                                                  ),
+                                                ),
+                                              // Favorite button
+                                              Positioned(
+                                                top: 10,
+                                                right: 10,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    favoriteProvider.toggleFavorite(recipe);
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey.withOpacity(0.3),
+                                                          spreadRadius: 1,
+                                                          blurRadius: 3,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: Icon(
+                                                      favoriteProvider.isExist(recipe) 
+                                                          ? Iconsax.heart5 
+                                                          : Iconsax.heart,
+                                                      size: 16,
+                                                      color: favoriteProvider.isExist(recipe) 
+                                                          ? Colors.red 
+                                                          : Colors.grey[600],
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                             ],
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              recipe.data() != null && 
+                                              (recipe.data() as Map<String, dynamic>).containsKey('name')
+                                                  ? recipe['name'] ?? 'Sans nom'
+                                                  : 'Sans nom',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            SizedBox(height: 5),
+                                            Text(
+                                              recipe.data() != null && 
+                                              (recipe.data() as Map<String, dynamic>).containsKey('time')
+                                                  ? "${recipe['time']} min • ${recipe.data() != null && (recipe.data() as Map<String, dynamic>).containsKey('cal') ? recipe['cal'] : '0'} cal"
+                                                  : 'Temps non spécifié',
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 12,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            SizedBox(height: 3),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.star,
+                                                  color: Colors.orange,
+                                                  size: 14,
+                                                ),
+                                                SizedBox(width: 2),
+                                                Text(
+                                                  recipe.data() != null && 
+                                                  (recipe.data() as Map<String, dynamic>).containsKey('rating')
+                                                      ? "${recipe['rating']} (${recipe.data() != null && (recipe.data() as Map<String, dynamic>).containsKey('reviews') ? recipe['reviews'] : '0'})"
+                                                      : '0.0 (0)',
+                                                  style: TextStyle(
+                                                    color: Colors.grey[600],
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
