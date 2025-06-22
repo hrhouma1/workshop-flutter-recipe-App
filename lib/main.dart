@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'Views/app_main_screen.dart';
+import 'Provider/favorite_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,9 +16,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AppMainScreen(),
+    return ChangeNotifierProvider(
+      create: (context) => FavoriteProvider(),
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: AppMainScreen(),
+      ),
     );
   }
 }
