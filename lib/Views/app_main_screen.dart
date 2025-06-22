@@ -92,17 +92,36 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
               SizedBox(height: 20),
               // for banner
               const BannerToExplore(),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(
                   vertical: 20,
                 ), // EdgeInsets.symmetric
-                child: Text(
-                  "Categories",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ), // TextStyle
-                ), // Text
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Categories",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ), // TextStyle
+                    ), // Text
+                    GestureDetector(
+                      onTap: () {
+                        // Action pour "View All"
+                        print("View All Categories clicked");
+                      },
+                      child: Text(
+                        "View All",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: kprimaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ), // Padding
               // Categories buttons from Firestore
               StreamBuilder<QuerySnapshot>(
@@ -120,6 +139,34 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                 },
               ),
               SizedBox(height: 20),
+              // Popular Recipes section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Popular Recipes",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // Action pour "View All Recipes"
+                      print("View All Recipes clicked");
+                    },
+                    child: Text(
+                      "View All",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: kprimaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 15),
               // Recipes from Firestore
               Container(
                 height: 400, // Hauteur fixe pour éviter les contraintes infinies
